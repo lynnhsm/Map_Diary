@@ -1,29 +1,422 @@
-body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-#map { height: 100vh; width: 100%; z-index: 1; }
+:root {
+  --topbar-height: 64px;
+  --sidebar-width: clamp(320px, 33vw, 4800px);
+}
 
-#sidebar { position: fixed; top: 0; right: -400px; width: 380px; height: 100vh; background: #f9f9f9; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: right 0.3s ease-in-out; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-#sidebar.active { right: 0; }
-#close-sidebar { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; float: right; margin-bottom: 20px; }
-#close-sidebar:hover { background: #cc0000; }
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
 
-.hidden { display: none !important; }
-#pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.modal-content { background: white; padding: 25px; border-radius: 8px; width: 320px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.modal-content input, .modal-content textarea, .modal-content button { padding: 10px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
-.modal-content button { background: #0078D7; color: white; border: none; cursor: pointer; font-weight: bold; }
-.modal-content button:hover { background: #005a9e; }
-#close-modal { cursor: pointer; align-self: flex-end; font-size: 20px; font-weight: bold; color: #555; }
+/* ===============================
+   TOP BAR
+=============================== */
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--topbar-height);
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  z-index: 2500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+  gap: 12px;
+}
 
-/* --- NEU: Timeline Design --- */
-.timeline { border-left: 3px solid #0078D7; padding-left: 20px; margin-left: 10px; margin-top: 20px; }
-.timeline-item { position: relative; margin-bottom: 30px; }
-.timeline-item::before { content: ''; position: absolute; left: -29px; top: 0; width: 12px; height: 12px; background: white; border: 3px solid #0078D7; border-radius: 50%; }
-.timeline-date { font-weight: bold; color: #0078D7; font-size: 14px; display: block; margin-bottom: 5px; }
-.timeline-title { font-size: 18px; margin: 0 0 10px 0; }
-.timeline-desc { font-size: 14px; color: #444; margin-bottom: 15px; line-height: 1.4; }
+.topbar-title h1 {
+  margin: 0;
+  font-size: 40px;
+  color: #0078D7;
+  text-align: center;
+}
 
-/* --- NEU: Bilder Karussell --- */
-.carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 10px; }
-.carousel img { flex: 0 0 100%; scroll-snap-align: center; border-radius: 6px; object-fit: cover; max-height: 250px; background: #eee; }
-.carousel::-webkit-scrollbar { height: 6px; }
-.carousel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.topbar-filters {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.topbar-filters select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.topbar-right {
+  display: flex;
+  gap: 10px;
+}
+
+.topbar-right button {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #0078D7;
+  color: white;
+  font-weight: 600;
+}
+
+.topbar-right button:hover {
+  background: #005a9e;
+}
+
+/* ===============================
+   MAP
+=============================== */
+#map {
+  height: calc(100vh - var(--topbar-height));
+  width: 100%;
+  margin-top: var(--topbar-height);
+  z-index: 1;
+}
+
+/* ===============================
+   SIDEBAR
+=============================== */
+#sidebar {
+  position: fixed;
+  top: var(--topbar-height);
+  right: calc(-1 * var(--sidebar-width));
+  width: var(--sidebar-width);
+  min-width: 320px;
+  height: calc(100vh - var(--topbar-height));
+  background: #f9f9f9;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+  transition: right 0.3s ease-in-out;
+  z-index: 2000;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#sidebar.active {
+  right: 0;
+}
+
+#close-sidebar {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 8px;
+}
+
+#close-sidebar:hover {
+  background: #cc0000;
+}
+
+/* Sidebar Toggle Button */
+#sidebar-toggle {
+  position: fixed;
+  right: 0;
+  top: calc(var(--topbar-height) + (100vh - var(--topbar-height))/2);
+  transform: translateY(-50%);
+  z-index: 2400;
+  padding: 10px 12px;
+  border-radius: 10px 0 0 10px;
+  border: none;
+  background: #0078D7;
+  color: white;
+  cursor: pointer;
+  box-shadow: -2px 2px 10px rgba(0,0,0,0.2);
+
+  /* wichtig: gleiche Animation wie Sidebar */
+  transition: right 0.3s ease-in-out;
+}
+
+#sidebar-toggle:hover {
+  background: #005a9e;
+}
+
+/* Toggle verschieben wenn Sidebar offen */
+#sidebar.active ~ #sidebar-toggle {
+  right: var(--sidebar-width);
+}
+
+/* ===============================
+   FILTERS + LIST
+=============================== */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.filters select,
+.filters button {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+#clear-filters {
+  background: #efefef;
+  cursor: pointer;
+}
+#clear-filters:hover {
+  background: #e4e4e4;
+}
+
+#trip-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 18px 0;
+}
+
+#trip-list li {
+  padding: 10px;
+  background: #ffffff;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+#trip-list li:hover {
+  background: #dbe9ff;
+  border-color: #b9d3ff;
+}
+
+/* ===============================
+   TIMELINE
+=============================== */
+.timeline {
+  border-left: 3px solid #0078D7;
+  padding-left: 16px;
+  margin-left: 8px;
+  margin-top: 10px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.timeline-item:hover {
+  background: #f0f6ff;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 3px solid #0078D7;
+  border-radius: 50%;
+}
+
+.timeline-date {
+  font-weight: bold;
+  color: #0078D7;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.timeline-title {
+  font-size: 18px;
+  margin: 6px 0 8px 0;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* Ort-Typ Badge (wird inline im JS gerendert) */
+
+/* ===============================
+   CAROUSEL
+=============================== */
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-top: 8px;
+}
+
+.carousel img {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  border-radius: 10px;
+  object-fit: cover;
+  max-height: 250px;
+  background: #eee;
+}
+
+.carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+/* ===============================
+   POPUP
+=============================== */
+.popup-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: none;
+  background: #0078D7;
+  color: #fff;
+  cursor: pointer;
+}
+
+.popup-btn:hover {
+  background: #005a9e;
+}
+
+.popup-preview {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  max-height: 140px;
+  object-fit: cover;
+  background: #eee;
+}
+
+/* ===============================
+   MODAL
+=============================== */
+.hidden {
+  display: none !important;
+}
+
+#pin-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.modal-content button {
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+.modal-content button {
+  background: #0078D7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-content button:hover {
+  background: #005a9e;
+}
+
+#close-modal {
+  cursor: pointer;
+  align-self: flex-end;
+  font-size: 22px;
+  font-weight: bold;
+  color: #555;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: #444;
+}
+
+.color-row input[type="color"] {
+  width: 54px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ===============================
+   COLORED TRIP MARKER (divIcon)
+=============================== */
+.trip-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 100vw;
+  }
+
+  #topbar {
+    grid-template-columns: 1fr;
+    height: auto;
+    padding: 10px 12px;
+  }
+
+  .topbar-right {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  #map {
+    margin-top: calc(var(--topbar-height) + 22px);
+  }
+}
